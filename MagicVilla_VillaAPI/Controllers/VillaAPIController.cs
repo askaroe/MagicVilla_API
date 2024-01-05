@@ -5,20 +5,37 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MagicVilla_VillaAPI.Controllers
 {
-    [Route("api/VillaAPI")]
+    [Route("api/VillaAPI")] // telling to swagger that is our api
     [ApiController]
     public class VillaAPIController : ControllerBase
     {
         [HttpGet]
-        public IEnumerable<VillaDTO> GetVillas()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult<IEnumerable<VillaDTO>> GetVillas()
         {
-            return VillaStore.villasList;
+            return Ok(VillaStore.villasList);
         }
 
         [HttpGet("{id::int}")]
-        public VillaDTO GetVilla(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)] // documenting responses
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        //[ProducesResponseType(200)] // documenting responses
+        public ActionResult<VillaDTO> GetVilla(int id)
         {
-            return VillaStore.villasList.FirstOrDefault(u => u.Id == id);
+            if(id == 0)
+            {
+                return BadRequest();
+            }
+
+            var villa = VillaStore.villasList.FirstOrDefault(u => u.Id == id);
+
+            if (villa == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(villa);
         }
     }
 }
